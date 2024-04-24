@@ -2,6 +2,9 @@
 CodeChatBot is a chatbot that can chat with you about code, programming, and technology. It uses multiple AI models to generate responses.
 The chatbot is built using OpenAI, MistralAI, Anthropi, and Cohere. It can answer questions, provide code examples, and help you with your coding problems, read documents, and more.
 
+## Chatbot Interface
+![Chatbot Interface](Preview.png)
+
 ## Features
 - Chat with the chatbot about code, programming, and technology
 - Get answers to your questions
