@@ -1,6 +1,8 @@
 # Multiple AI ChatBot - OpenAI, MistralAI, Anthropic and Cohere
 CodeChatBot is a chatbot that can chat with you about code, programming, and technology. It uses multiple AI models to generate responses.
-The chatbot is built using OpenAI, MistralAI, Anthropi, and Cohere. It can answer questions, provide code examples, and help you with your coding problems, read documents, and more.
+The chatbot is built using OpenAI, MistralAI, Anthropic, and Cohere. It can answer questions, provide code examples, and help you with your coding problems, read documents, and more.
+
+This is a small project of mine to get familiar with the writing streamlit apps and LLM's. Please feel free to reach out to me with how I can improve this code as I am a hobbyist coder and always looking to improve.
 
 ## Chatbot Interface
 ![Chatbot Interface](Preview.png)
