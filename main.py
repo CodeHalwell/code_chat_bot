@@ -390,21 +390,7 @@ if ai_provider == 'OpenAI':
 
             response = st.write_stream(stream)
 
-        with st.chat_message("assistant"):
-            stream_2 = openai_client.chat.completions.create(
-                model=model,
-                messages=messages,
-                stream=True,
-                temperature=temperature,
-                max_tokens=1
-            )
-
-            model_used = []
-
-            for chunk in stream_2:
-                model_used.append(chunk.model)
-
-            st.markdown(f"I was generated using: {model_used[-1]}")
+            st.markdown(f"I was generated using: {model}")
 
         st.session_state.messages.append({"role": "assistant", "content": response})
 
