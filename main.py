@@ -41,7 +41,7 @@ try:
 
     # Model selection based on the provider
     model_options = {
-        "OpenAI": ['gpt-4', "gpt-4-turbo-2024-04-09", "gpt-3.5-turbo-0125", "gpt-3.5-turbo-instuct"],
+        "OpenAI": ['gpt-4', "gpt-4-turbo-2024-04-09", "gpt-3.5-turbo-0125", "gpt-3.5-turbo-instruct"],
         "MistralAI": ['open-mistral-7b', 'open-mixtral-8x7b', 'open-mixtral-8x22b', 'mistral-small-latest', 'mistral-medium-latest', 'mistral-large-latest', 'mistral-embed'],
         "Anthropic": ['claude-3-opus-20240229', 'claude-3-sonnet-20240229', 'claude-3-haiku-20240307', 'claude-2.1', 'claude-2.0', 'claude-instant-1.2'],
         "Cohere": ['command-r-plus', 'command-r', 'command', 'command-nightly', 'command-light', 'command-light-nightly']
