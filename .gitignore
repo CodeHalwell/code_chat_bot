@@ -1,2 +1,7 @@
 .env
 /chatbotvenv
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
