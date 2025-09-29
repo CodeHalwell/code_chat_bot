@@ -12,6 +12,20 @@ from ..models import ChatMessage, AIProviderConfig
 from ..config import ConfigManager
 
 
+def approximate_token_count(text: str) -> int:
+    """
+    Approximate token count using word count heuristic.
+    This is a rough approximation used for non-OpenAI models.
+    
+    Args:
+        text: The text to count tokens for
+        
+    Returns:
+        Approximate token count
+    """
+    return int(len(text.split()) * 1.3)
+
+
 class BaseAIProvider(ABC):
     """Base class for AI providers."""
     
@@ -103,7 +117,7 @@ class MistralAIProvider(BaseAIProvider):
     
     def count_tokens(self, text: str) -> int:
         """Approximate token count for Mistral models."""
-        return len(text.split()) * 1.3  # Rough approximation
+        return approximate_token_count(text)
 
 
 class AnthropicProvider(BaseAIProvider):
@@ -145,7 +159,7 @@ class AnthropicProvider(BaseAIProvider):
     
     def count_tokens(self, text: str) -> int:
         """Approximate token count for Anthropic models."""
-        return len(text.split()) * 1.3  # Rough approximation
+        return approximate_token_count(text)
 
 
 class CohereProvider(BaseAIProvider):
@@ -191,7 +205,7 @@ class CohereProvider(BaseAIProvider):
     
     def count_tokens(self, text: str) -> int:
         """Approximate token count for Cohere models."""
-        return len(text.split()) * 1.3  # Rough approximation
+        return approximate_token_count(text)
 
 
 def get_provider(provider_config: AIProviderConfig, config_manager: ConfigManager) -> BaseAIProvider:

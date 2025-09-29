@@ -160,6 +160,11 @@ try:
         except Exception as e:
             st.error(f"Error processing document: {e}")
 
+        # Update system message with enhanced context if document search was performed
+        if enhanced_prompt != pre_prompt:
+            # Update the system message in session state
+            st.session_state.messages[0]["content"] = enhanced_prompt
+
         # Convert messages to Pydantic models
         chat_messages = [ChatMessage(role=msg["role"], content=msg["content"]) for msg in st.session_state.messages]
 
