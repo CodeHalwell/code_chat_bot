@@ -105,7 +105,7 @@ COHERE=your_cohere_api_key
 
 ### Dependencies
 - Install requirements: `pip install -r requirements.txt`
-- **Note**: `langchain-chroma` may need to be added to requirements.txt if not already included
+- **Important**: `langchain-chroma` is required but missing from requirements.txt. Install it with: `pip install langchain-chroma`
 - Run application: `streamlit run main.py`
 
 ## Common Issues and Solutions
