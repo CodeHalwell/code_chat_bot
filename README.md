@@ -17,10 +17,34 @@ This is a small project of mine to get familiar with the writing streamlit apps 
 - Swap between different AI models during the conversation
 
 ## How to Install
-1. Clone the repository
-2. Install the requirements
-3. Run the chatbot
 
+### Modern Installation with uv (Recommended)
+1. Clone the repository
+2. Install uv package manager 
+3. Install dependencies and run the chatbot
+
+```bash
+git clone https://github.com/CodeHalwell/code_chat_bot.git
+cd code_chat_bot
+# Install uv if you haven't already
+curl -LsSf https://astral.sh/uv/install.sh | sh
+# Or: pip install uv
+
+# Install dependencies
+uv sync
+
+# Set up environment variables
+touch .env
+echo OPENAI=YOUR_KEY_GOES_HERE >> .env
+echo MISTRAL=YOUR_KEY_GOES_HERE >> .env
+echo ANTHROPIC=YOUR_KEY_GOES_HERE >> .env
+echo COHERE=YOUR_KEY_GOES_HERE >> .env
+
+# Run the chatbot
+uv run streamlit run main.py
+```
+
+### Legacy Installation with pip
 ```bash
 git clone https://github.com/CodeHalwell/code_chat_bot.git
 cd code_chat_bot
