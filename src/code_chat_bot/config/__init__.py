@@ -15,77 +15,147 @@ class ConfigManager:
     def __init__(self):
         self.app_config = AppConfig(
             OPENAI=os.getenv("OPENAI"),
-            MISTRAL=os.getenv("MISTRAL"), 
+            MISTRAL=os.getenv("MISTRAL"),
             ANTHROPIC=os.getenv("ANTHROPIC"),
-            COHERE=os.getenv("COHERE")
+            COHERE=os.getenv("COHERE"),
+            GOOGLE=os.getenv("GOOGLE_API_KEY")
         )
         self.model_costs = self._load_model_costs()
     
     def _load_model_costs(self) -> Dict[str, ModelPricing]:
         """Load model pricing information."""
         return {
-            "open-mistral-7b": ModelPricing(
-                description="A 7B transformer model, fast-deployed and easily customizable for various applications.",
-                input_price_1M_tokens=0.25,
-                output_price_1M_tokens=0.25
+            # OpenAI Models
+            "gpt-4o": ModelPricing(
+                description="GPT-4o - Most advanced multimodal model with vision, faster and cheaper than GPT-4 Turbo.",
+                input_price_1M_tokens=5.0,
+                output_price_1M_tokens=15.0
             ),
-            "open-mixtral-8x7b": ModelPricing(
-                description="A 7B sparse Mixture-of-Experts model with 12.9B active parameters from a total of 45B, designed for efficient large-scale processing.",
-                input_price_1M_tokens=0.7,
-                output_price_1M_tokens=0.7
+            "gpt-4o-mini": ModelPricing(
+                description="GPT-4o mini - Small, affordable, and intelligent model for fast, lightweight tasks.",
+                input_price_1M_tokens=0.15,
+                output_price_1M_tokens=0.60
             ),
-            "open-mixtral-8x22b": ModelPricing(
-                description="A high-performance 22B sparse Mixture-of-Experts model utilizing 39B active parameters from 141B total, suitable for complex problem solving.",
-                input_price_1M_tokens=2,
-                output_price_1M_tokens=6
+            "o1-preview": ModelPricing(
+                description="OpenAI o1-preview - Advanced reasoning model for complex problem-solving.",
+                input_price_1M_tokens=15.0,
+                output_price_1M_tokens=60.0
             ),
-            "mistral-small-latest": ModelPricing(
-                description="Designed for cost-effective reasoning with low latency, ideal for quick response applications.",
-                input_price_1M_tokens=2,
-                output_price_1M_tokens=6
+            "o1-mini": ModelPricing(
+                description="OpenAI o1-mini - Fast reasoning model for coding and STEM tasks.",
+                input_price_1M_tokens=3.0,
+                output_price_1M_tokens=12.0
             ),
-            "mistral-medium-latest": ModelPricing(
-                description="Medium-scale model providing a balance between performance and cost, suitable for a range of applications.",
-                input_price_1M_tokens=2.7,
-                output_price_1M_tokens=8.1
-            ),
-            "mistral-large-latest": ModelPricing(
-                description="The flagship model of the Mistral series, offering advanced reasoning capabilities for the most demanding tasks.",
-                input_price_1M_tokens=8,
-                output_price_1M_tokens=24
-            ),
-            "mistral-embed": ModelPricing(
-                description="Advanced model for semantic extraction from text, ideal for creating meaningful text representations.",
-                input_price_1M_tokens=0.1,
-                output_price_1M_tokens=0.1
-            ),
-            "claude-3-haiku-20240307": ModelPricing(
-                description="Optimized for speed and efficiency, well-suited for lightweight tasks requiring quick turnarounds.",
-                input_price_1M_tokens=0.25,
-                output_price_1M_tokens=1.25
-            ),
-            "claude-3-sonnet-20240229": ModelPricing(
-                description="Designed for robust performance on demanding tasks, offering detailed and extensive responses.",
-                input_price_1M_tokens=3,
-                output_price_1M_tokens=15
-            ),
-            "claude-3-opus-20240229": ModelPricing(
-                description="Most powerful model for highly complex tasks.",
-                input_price_1M_tokens=15,
-                output_price_1M_tokens=75
-            ),
-            "gpt-4": ModelPricing(
-                description="Most capable GPT-4 model, great for tasks that require a lot of nuance and careful reasoning.",
-                input_price_1M_tokens=30,
-                output_price_1M_tokens=60
-            ),
-            "gpt-4-turbo-2024-04-09": ModelPricing(
-                description="Latest GPT-4 Turbo with improved instruction following and JSON mode.",
+            "gpt-4-turbo": ModelPricing(
+                description="GPT-4 Turbo with improved instruction following and JSON mode.",
                 input_price_1M_tokens=10,
                 output_price_1M_tokens=30
             ),
-            "gpt-3.5-turbo-0125": ModelPricing(
-                description="Updated GPT 3.5 Turbo model with improved instruction following.",
+            "gpt-4": ModelPricing(
+                description="Most capable GPT-4 model, great for tasks that require nuance and reasoning.",
+                input_price_1M_tokens=30,
+                output_price_1M_tokens=60
+            ),
+            "gpt-3.5-turbo": ModelPricing(
+                description="Fast, inexpensive model for simple tasks.",
+                input_price_1M_tokens=0.5,
+                output_price_1M_tokens=1.5
+            ),
+
+            # Anthropic Models
+            "claude-3-5-sonnet-20241022": ModelPricing(
+                description="Claude 3.5 Sonnet - Most intelligent model, with best-in-class coding and agentic capabilities.",
+                input_price_1M_tokens=3.0,
+                output_price_1M_tokens=15.0
+            ),
+            "claude-3-opus-20240229": ModelPricing(
+                description="Claude 3 Opus - Most powerful model for highly complex tasks.",
+                input_price_1M_tokens=15,
+                output_price_1M_tokens=75
+            ),
+            "claude-3-sonnet-20240229": ModelPricing(
+                description="Claude 3 Sonnet - Balanced performance for enterprise workloads.",
+                input_price_1M_tokens=3,
+                output_price_1M_tokens=15
+            ),
+            "claude-3-haiku-20240307": ModelPricing(
+                description="Claude 3 Haiku - Fastest and most compact model for near-instant responsiveness.",
+                input_price_1M_tokens=0.25,
+                output_price_1M_tokens=1.25
+            ),
+
+            # MistralAI Models
+            "mistral-large-latest": ModelPricing(
+                description="Mistral Large - Flagship model with advanced reasoning capabilities.",
+                input_price_1M_tokens=8,
+                output_price_1M_tokens=24
+            ),
+            "mistral-medium-latest": ModelPricing(
+                description="Mistral Medium - Balanced performance and cost.",
+                input_price_1M_tokens=2.7,
+                output_price_1M_tokens=8.1
+            ),
+            "mistral-small-latest": ModelPricing(
+                description="Mistral Small - Cost-effective reasoning with low latency.",
+                input_price_1M_tokens=2,
+                output_price_1M_tokens=6
+            ),
+            "open-mixtral-8x22b": ModelPricing(
+                description="Mixtral 8x22B - High-performance sparse MoE model.",
+                input_price_1M_tokens=2,
+                output_price_1M_tokens=6
+            ),
+            "open-mixtral-8x7b": ModelPricing(
+                description="Mixtral 8x7B - Efficient sparse MoE model.",
+                input_price_1M_tokens=0.7,
+                output_price_1M_tokens=0.7
+            ),
+            "open-mistral-7b": ModelPricing(
+                description="Mistral 7B - Fast and customizable base model.",
+                input_price_1M_tokens=0.25,
+                output_price_1M_tokens=0.25
+            ),
+            "mistral-embed": ModelPricing(
+                description="Mistral Embed - Advanced semantic text embeddings.",
+                input_price_1M_tokens=0.1,
+                output_price_1M_tokens=0.1
+            ),
+
+            # Cohere Models
+            "command-r-plus": ModelPricing(
+                description="Command R+ - Most powerful model for complex RAG and tool use.",
+                input_price_1M_tokens=3.0,
+                output_price_1M_tokens=15.0
+            ),
+            "command-r": ModelPricing(
+                description="Command R - Optimized for RAG and long-context tasks.",
+                input_price_1M_tokens=0.5,
+                output_price_1M_tokens=1.5
+            ),
+            "command": ModelPricing(
+                description="Command - Versatile model for general use cases.",
+                input_price_1M_tokens=1.0,
+                output_price_1M_tokens=2.0
+            ),
+            "command-light": ModelPricing(
+                description="Command Light - Faster, lightweight version for simple tasks.",
+                input_price_1M_tokens=0.3,
+                output_price_1M_tokens=0.6
+            ),
+
+            # Google Gemini Models
+            "gemini-1.5-pro": ModelPricing(
+                description="Gemini 1.5 Pro - Most capable model with 2M token context window.",
+                input_price_1M_tokens=3.5,
+                output_price_1M_tokens=10.5
+            ),
+            "gemini-1.5-flash": ModelPricing(
+                description="Gemini 1.5 Flash - Fast and efficient multimodal model.",
+                input_price_1M_tokens=0.35,
+                output_price_1M_tokens=1.05
+            ),
+            "gemini-pro": ModelPricing(
+                description="Gemini Pro - Versatile model for various tasks.",
                 input_price_1M_tokens=0.5,
                 output_price_1M_tokens=1.5
             ),
@@ -98,6 +168,7 @@ class ConfigManager:
             "MistralAI": self.app_config.mistral_api_key,
             "Anthropic": self.app_config.anthropic_api_key,
             "Cohere": self.app_config.cohere_api_key,
+            "Google": self.app_config.google_api_key,
         }
         return key_mapping.get(provider)
     

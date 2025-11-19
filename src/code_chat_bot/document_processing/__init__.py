@@ -1,12 +1,19 @@
-"""Document processing module using Pydantic models."""
-from typing import List
+"""Document processing module using Pydantic models with enhanced RAG capabilities."""
+from typing import List, Dict, Optional, Any
 from langchain_community.document_loaders.csv_loader import CSVLoader
 from langchain_community.document_loaders.pdf import PyPDFLoader
 from langchain_community.document_loaders.text import TextLoader
 from langchain_community.document_loaders import WebBaseLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.text_splitter import (
+    RecursiveCharacterTextSplitter,
+    TokenTextSplitter,
+    CharacterTextSplitter,
+    MarkdownTextSplitter,
+    PythonCodeTextSplitter
+)
 from langchain_chroma import Chroma
 from langchain_openai import OpenAIEmbeddings
+from langchain.schema import Document
 
 from ..models import DocumentMetadata, VectorSearchResult
 from ..config import ConfigManager
@@ -52,42 +59,281 @@ class DocumentProcessor:
         return loader.load()
 
 
+class EnhancedTextSplitter:
+    """Factory for creating different types of text splitters."""
+
+    @staticmethod
+    def get_splitter(
+        strategy: str = "recursive",
+        chunk_size: int = 500,
+        chunk_overlap: int = 75,
+        **kwargs
+    ):
+        """
+        Get a text splitter based on strategy.
+
+        Args:
+            strategy: Splitting strategy ('recursive', 'token', 'character', 'markdown', 'code')
+            chunk_size: Size of each chunk
+            chunk_overlap: Overlap between chunks
+            **kwargs: Additional parameters for specific splitters
+
+        Returns:
+            Text splitter instance
+        """
+        if strategy == "recursive":
+            return RecursiveCharacterTextSplitter(
+                chunk_size=chunk_size,
+                chunk_overlap=chunk_overlap,
+                separators=kwargs.get("separators", ["\n\n", "\n", ". ", " ", ""])
+            )
+        elif strategy == "token":
+            return TokenTextSplitter(
+                chunk_size=chunk_size,
+                chunk_overlap=chunk_overlap
+            )
+        elif strategy == "character":
+            return CharacterTextSplitter(
+                chunk_size=chunk_size,
+                chunk_overlap=chunk_overlap,
+                separator=kwargs.get("separator", "\n\n")
+            )
+        elif strategy == "markdown":
+            return MarkdownTextSplitter(
+                chunk_size=chunk_size,
+                chunk_overlap=chunk_overlap
+            )
+        elif strategy == "code":
+            return PythonCodeTextSplitter(
+                chunk_size=chunk_size,
+                chunk_overlap=chunk_overlap
+            )
+        else:
+            return RecursiveCharacterTextSplitter(
+                chunk_size=chunk_size,
+                chunk_overlap=chunk_overlap
+            )
+
+
 class VectorStore:
-    """Enhanced vector database with Pydantic validation."""
-    
-    def __init__(self, config_manager: ConfigManager):
+    """Enhanced vector database with advanced RAG capabilities."""
+
+    def __init__(self, config_manager: ConfigManager, persist_directory: Optional[str] = None):
+        """
+        Initialize vector store.
+
+        Args:
+            config_manager: Configuration manager
+            persist_directory: Optional directory to persist the vector store
+        """
         self.config_manager = config_manager
-    
-    def split_document(self, document, metadata: DocumentMetadata) -> List:
-        """Split the document into smaller parts based on metadata settings."""
-        splitter = RecursiveCharacterTextSplitter(
-            chunk_size=metadata.chunk_size, 
+        self.persist_directory = persist_directory
+
+    def split_document(
+        self,
+        document,
+        metadata: DocumentMetadata,
+        strategy: str = "recursive",
+        add_metadata: bool = True
+    ) -> List[Document]:
+        """
+        Split documents using various strategies with enhanced metadata.
+
+        Args:
+            document: Document(s) to split
+            metadata: Document metadata
+            strategy: Splitting strategy
+            add_metadata: Whether to add metadata to chunks
+
+        Returns:
+            List of split documents with metadata
+        """
+        splitter = EnhancedTextSplitter.get_splitter(
+            strategy=strategy,
+            chunk_size=metadata.chunk_size,
             chunk_overlap=metadata.chunk_overlap
         )
-        return splitter.split_documents([document]) if not isinstance(document, list) else splitter.split_documents(document)
-    
-    def embed_upload(self, collection_name: str, split_documents: List) -> Chroma:
-        """Upload document segments to the vector database and create an index."""
+
+        documents = [document] if not isinstance(document, list) else document
+        split_docs = splitter.split_documents(documents)
+
+        # Add enhanced metadata to each chunk
+        if add_metadata:
+            for i, doc in enumerate(split_docs):
+                doc.metadata.update({
+                    "chunk_id": i,
+                    "chunk_size": len(doc.page_content),
+                    "file_type": metadata.file_type,
+                    "source": metadata.file_path or metadata.url,
+                    "splitting_strategy": strategy
+                })
+
+        return split_docs
+
+    def embed_upload(
+        self,
+        collection_name: str,
+        split_documents: List[Document],
+        embedding_model: str = "text-embedding-3-small"
+    ) -> Chroma:
+        """
+        Upload document segments to vector database with advanced embeddings.
+
+        Args:
+            collection_name: Name of the collection
+            split_documents: Documents to embed
+            embedding_model: OpenAI embedding model to use
+
+        Returns:
+            Chroma vector store instance
+        """
         api_key = self.config_manager.get_api_key("OpenAI")
-        embeddings = OpenAIEmbeddings(api_key=api_key)
-        db = Chroma.from_documents(
-            documents=split_documents, 
-            embedding=embeddings, 
-            collection_name=collection_name
+        embeddings = OpenAIEmbeddings(
+            api_key=api_key,
+            model=embedding_model
         )
+
+        if self.persist_directory:
+            db = Chroma.from_documents(
+                documents=split_documents,
+                embedding=embeddings,
+                collection_name=collection_name,
+                persist_directory=self.persist_directory
+            )
+        else:
+            db = Chroma.from_documents(
+                documents=split_documents,
+                embedding=embeddings,
+                collection_name=collection_name
+            )
+
         return db
-    
-    def search_vector_db(self, vector_store: Chroma, query: str, k: int = 5) -> List[VectorSearchResult]:
-        """Search the vector database for documents similar to the query."""
+
+    def search_vector_db(
+        self,
+        vector_store: Chroma,
+        query: str,
+        k: int = 5,
+        filter_dict: Optional[Dict[str, Any]] = None,
+        search_type: str = "similarity"
+    ) -> List[VectorSearchResult]:
+        """
+        Search vector database with advanced filtering and search types.
+
+        Args:
+            vector_store: Chroma vector store
+            query: Search query
+            k: Number of results to return
+            filter_dict: Metadata filters to apply
+            search_type: Type of search ('similarity', 'mmr', 'similarity_score_threshold')
+
+        Returns:
+            List of VectorSearchResult with relevance scores
+        """
         api_key = self.config_manager.get_api_key("OpenAI")
-        embedding_vector = OpenAIEmbeddings(api_key=api_key).embed_query(query)
-        results = vector_store.similarity_search_by_vector_with_relevance_scores(embedding_vector, k=k)
-        
-        # Convert to Pydantic models
-        return [
-            VectorSearchResult(content=doc.page_content, score=score)
-            for doc, score in results
-        ]
+
+        if search_type == "mmr":
+            # Maximal Marginal Relevance search (diversity)
+            results = vector_store.max_marginal_relevance_search(
+                query,
+                k=k,
+                filter=filter_dict
+            )
+            # MMR doesn't return scores, so we assign default
+            return [
+                VectorSearchResult(content=doc.page_content, score=1.0 - (i * 0.1))
+                for i, doc in enumerate(results)
+            ]
+        else:
+            # Similarity search with scores
+            embedding_vector = OpenAIEmbeddings(api_key=api_key).embed_query(query)
+            results = vector_store.similarity_search_by_vector_with_relevance_scores(
+                embedding_vector,
+                k=k,
+                filter=filter_dict
+            )
+
+            return [
+                VectorSearchResult(content=doc.page_content, score=score)
+                for doc, score in results
+            ]
+
+    def hybrid_search(
+        self,
+        vector_store: Chroma,
+        query: str,
+        k: int = 5,
+        filter_dict: Optional[Dict[str, Any]] = None
+    ) -> List[VectorSearchResult]:
+        """
+        Perform hybrid search combining semantic and keyword search.
+
+        Args:
+            vector_store: Chroma vector store
+            query: Search query
+            k: Number of results
+            filter_dict: Metadata filters
+
+        Returns:
+            List of VectorSearchResult combining both search methods
+        """
+        # Get semantic search results
+        semantic_results = self.search_vector_db(
+            vector_store, query, k=k, filter_dict=filter_dict
+        )
+
+        # Get MMR results for diversity
+        mmr_results = self.search_vector_db(
+            vector_store, query, k=k, filter_dict=filter_dict, search_type="mmr"
+        )
+
+        # Combine and deduplicate results
+        seen = set()
+        combined = []
+
+        for result in semantic_results + mmr_results:
+            if result.content not in seen:
+                seen.add(result.content)
+                combined.append(result)
+
+        # Return top k unique results
+        return combined[:k]
+
+    def get_relevant_context(
+        self,
+        vector_store: Chroma,
+        query: str,
+        max_tokens: int = 2000,
+        **kwargs
+    ) -> str:
+        """
+        Get relevant context formatted for RAG, respecting token limits.
+
+        Args:
+            vector_store: Chroma vector store
+            query: Search query
+            max_tokens: Maximum tokens for context
+            **kwargs: Additional search parameters
+
+        Returns:
+            Formatted context string
+        """
+        results = self.search_vector_db(vector_store, query, **kwargs)
+
+        context_parts = []
+        current_length = 0
+
+        for i, result in enumerate(results, 1):
+            chunk_text = f"[Document {i}] (Relevance: {result.score:.2f})\n{result.content}\n"
+            chunk_length = len(chunk_text.split())  # Rough token estimate
+
+            if current_length + chunk_length <= max_tokens:
+                context_parts.append(chunk_text)
+                current_length += chunk_length
+            else:
+                break
+
+        return "\n".join(context_parts)
 
 
 def perform_vector_db_search(

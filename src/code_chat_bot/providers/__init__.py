@@ -7,6 +7,7 @@ from mistralai.client import MistralClient
 from anthropic import Anthropic
 import cohere
 import tiktoken
+import google.generativeai as genai
 
 from ..models import ChatMessage, AIProviderConfig
 from ..config import ConfigManager
@@ -208,6 +209,82 @@ class CohereProvider(BaseAIProvider):
         return approximate_token_count(text)
 
 
+class GoogleProvider(BaseAIProvider):
+    """Google AI (Gemini) provider implementation."""
+
+    def _initialize_client(self):
+        api_key = self.config_manager.get_api_key("Google")
+        genai.configure(api_key=api_key)
+        return genai.GenerativeModel(self.config.model)
+
+    def generate_response(self, messages: List[ChatMessage], stream: bool = True) -> Iterator[str]:
+        """Generate response from Google Gemini model."""
+        # Convert messages to Gemini format
+        chat_history = []
+        current_message = ""
+
+        for msg in messages:
+            if msg.role == "system":
+                # Add system message as first user message with context
+                chat_history.append({
+                    "role": "user",
+                    "parts": [f"System instructions: {msg.content}"]
+                })
+                chat_history.append({
+                    "role": "model",
+                    "parts": ["Understood. I will follow these instructions."]
+                })
+            elif msg.role == "user":
+                current_message = msg.content
+                if len(chat_history) > 0:  # Not the first message
+                    chat_history.append({
+                        "role": "user",
+                        "parts": [msg.content]
+                    })
+            elif msg.role == "assistant":
+                chat_history.append({
+                    "role": "model",
+                    "parts": [msg.content]
+                })
+
+        # Start chat with history
+        if len(chat_history) > 0:
+            # Remove the last user message if it exists
+            if chat_history and chat_history[-1]["role"] == "user":
+                current_message = chat_history[-1]["parts"][0]
+                chat_history = chat_history[:-1]
+
+            chat = self.client.start_chat(history=chat_history)
+        else:
+            chat = self.client.start_chat()
+
+        # Generate response
+        generation_config = {
+            "temperature": self.config.temperature,
+            "max_output_tokens": self.config.max_tokens,
+        }
+
+        if stream:
+            response = chat.send_message(
+                current_message,
+                generation_config=generation_config,
+                stream=True
+            )
+            for chunk in response:
+                if chunk.text:
+                    yield chunk.text
+        else:
+            response = chat.send_message(
+                current_message,
+                generation_config=generation_config
+            )
+            yield response.text
+
+    def count_tokens(self, text: str) -> int:
+        """Approximate token count for Google models."""
+        return approximate_token_count(text)
+
+
 def get_provider(provider_config: AIProviderConfig, config_manager: ConfigManager) -> BaseAIProvider:
     """Factory function to get the appropriate AI provider."""
     providers = {
@@ -215,10 +292,11 @@ def get_provider(provider_config: AIProviderConfig, config_manager: ConfigManage
         "MistralAI": MistralAIProvider,
         "Anthropic": AnthropicProvider,
         "Cohere": CohereProvider,
+        "Google": GoogleProvider,
     }
-    
+
     provider_class = providers.get(provider_config.provider)
     if not provider_class:
         raise ValueError(f"Unsupported provider: {provider_config.provider}")
-    
+
     return provider_class(provider_config, config_manager)

@@ -19,11 +19,12 @@ class ChatMessage(BaseModel):
 class AppConfig(BaseModel):
     """Application configuration model."""
     model_config = ConfigDict(env_prefix="")
-    
+
     openai_api_key: Optional[str] = Field(None, alias="OPENAI")
     mistral_api_key: Optional[str] = Field(None, alias="MISTRAL")
     anthropic_api_key: Optional[str] = Field(None, alias="ANTHROPIC")
     cohere_api_key: Optional[str] = Field(None, alias="COHERE")
+    google_api_key: Optional[str] = Field(None, alias="GOOGLE")
 
 
 class DocumentMetadata(BaseModel):
@@ -43,7 +44,7 @@ class VectorSearchResult(BaseModel):
 
 class AIProviderConfig(BaseModel):
     """Configuration for AI providers."""
-    provider: Literal["OpenAI", "MistralAI", "Anthropic", "Cohere"]
+    provider: Literal["OpenAI", "MistralAI", "Anthropic", "Cohere", "Google"]
     model: str
     temperature: float = Field(default=0.7, ge=0, le=2)
     max_tokens: int = Field(default=1000, ge=1)

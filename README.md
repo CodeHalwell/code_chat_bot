@@ -1,108 +1,282 @@
-# Multiple AI ChatBot - OpenAI, MistralAI, Anthropic and Cohere
-CodeChatBot is a chatbot that can chat with you about code, programming, and technology. It uses multiple AI models to generate responses.
-The chatbot is built using OpenAI, MistralAI, Anthropic, and Cohere. It can answer questions, provide code examples, and help you with your coding problems, read documents, and more.
+# AI ChatBot Pro - Enhanced Multi-Provider AI Assistant
 
-This is a small project of mine to get familiar with the writing streamlit apps and LLM's. Please feel free to reach out to me with how I can improve this code as I am a hobbyist coder and always looking to improve.
+**Now with 5 AI Providers + Advanced Features!**
+
+CodeChatBot Pro is an advanced AI chatbot application that integrates multiple AI providers with cutting-edge features including voice I/O, NLP analysis, multi-language support, and intelligent document processing.
+
+## 🌟 Latest Updates
+
+### New AI Provider
+- **Google Gemini**: Access to Gemini 1.5 Pro, Flash, and Pro models
+
+### Latest Models (2024)
+- **OpenAI**: GPT-4o, GPT-4o-mini, o1-preview, o1-mini
+- **Anthropic**: Claude 3.5 Sonnet, Claude 3 Opus
+- **MistralAI**: Mistral Large, Medium, Small, Mixtral models
+- **Cohere**: Command R+, Command R
+- **Google**: Gemini 1.5 Pro/Flash
+
+### Enhanced Features
+- 🎙️ **Voice Input/Output**: Speak to the AI and hear responses
+- 📊 **NLP Analysis**: Sentiment analysis and entity recognition
+- 🌍 **Multi-language Support**: 15+ languages
+- 💾 **Database Integration**: PostgreSQL, MongoDB, Firebase, JSON
+- 📈 **Monitoring & Logging**: Comprehensive metrics and logging
+- 🤖 **AI Agents**: Autonomous task execution
+- 🔍 **Enhanced RAG**: Multiple chunking strategies, hybrid search
+- 🎨 **Modern UI**: Tabs, expandable sections, metrics dashboard
 
 ## Chatbot Interface
 ![Chatbot Interface](Preview.png)
 
-## Features
-- Chat with the chatbot about code, programming, and technology
-- Get answers to your questions
-- Get code examples
-- Get help with your coding problems
-- Read documents (pdf, docx, txt, etc.)
-- Read URLs (web pages)
-- Swap between different AI models during the conversation
+## Core Features
 
-## How to Install
+### AI Capabilities
+- ✅ Chat with 5 different AI providers (OpenAI, Anthropic, MistralAI, Cohere, Google)
+- ✅ 25+ different AI models to choose from
+- ✅ Switch providers and models mid-conversation
+- ✅ Adjustable temperature and token limits
+- ✅ Real-time cost tracking
 
-### Modern Installation with uv (Recommended)
-1. Clone the repository
-2. Install uv package manager 
-3. Install dependencies and run the chatbot
+### Document Processing
+- ✅ Upload and analyze PDFs, TXT, CSV files
+- ✅ Process web pages via URL
+- ✅ Advanced RAG with multiple chunking strategies
+- ✅ Hybrid search (semantic + keyword)
+- ✅ Metadata filtering and relevance scoring
 
+### Advanced Features
+- 🎙️ **Voice Interaction**: Speech-to-text and text-to-speech
+- 📊 **Sentiment Analysis**: Track conversation sentiment
+- 🏷️ **Entity Recognition**: Extract people, places, organizations
+- 🌐 **15+ Languages**: Full UI translation
+- 💾 **Persistent Storage**: Multiple database backends
+- 📈 **Analytics Dashboard**: Metrics, costs, token usage
+- 🤖 **AI Agents**: Research, summarization, Q&A agents
+
+## Quick Start
+
+### Installation
+
+**Option 1: Modern Installation with uv (Recommended)**
 ```bash
 git clone https://github.com/CodeHalwell/code_chat_bot.git
 cd code_chat_bot
-# Install uv if you haven't already
+
+# Install uv package manager
 curl -LsSf https://astral.sh/uv/install.sh | sh
-# Or: pip install uv
 
 # Install dependencies
 uv sync
 
 # Set up environment variables
 touch .env
-echo OPENAI=YOUR_KEY_GOES_HERE >> .env
-echo MISTRAL=YOUR_KEY_GOES_HERE >> .env
-echo ANTHROPIC=YOUR_KEY_GOES_HERE >> .env
-echo COHERE=YOUR_KEY_GOES_HERE >> .env
+echo OPENAI=your_openai_key >> .env
+echo MISTRAL=your_mistral_key >> .env
+echo ANTHROPIC=your_anthropic_key >> .env
+echo COHERE=your_cohere_key >> .env
+echo GOOGLE_API_KEY=your_google_key >> .env
 
-# Run the chatbot
+# Run the standard app
 uv run streamlit run main.py
+
+# Or run the enhanced app (with all features)
+uv run streamlit run main_enhanced.py
 ```
 
-### Legacy Installation with pip
+**Option 2: pip Installation**
 ```bash
 git clone https://github.com/CodeHalwell/code_chat_bot.git
 cd code_chat_bot
+
+# Install core dependencies
 pip install -r requirements.txt
+
+# Set up environment variables
 touch .env
-echo OPENAI=YOUR_KEY_GOES_HERE >> .env
-echo MISTRAL=YOUR_KEY_GOES_HERE >> .env
-echo ANTHROPIC=YOUR_KEY_GOES_HERE >> .env
-echo COHERE=YOUR_KEY_GOES_HERE >> .env
+echo OPENAI=your_openai_key >> .env
+echo MISTRAL=your_mistral_key >> .env
+echo ANTHROPIC=your_anthropic_key >> .env
+echo COHERE=your_cohere_key >> .env
+echo GOOGLE_API_KEY=your_google_key >> .env
+
+# Run the app
 streamlit run main.py
 ```
 
-## Code Structure
-- `main.py`: Main file to run the chatbot
-- `document_loader.py`: Load documents from different sources
+### Optional Feature Installation
 
-# File Structure
-```
-./previous_chats - Used to store and load previous chat logs
-./upload_docs - Staging area for uploaded documents
-
+**For Voice Features:**
+```bash
+pip install SpeechRecognition pyttsx3 gTTS pyaudio
+# Linux: sudo apt-get install portaudio19-dev python3-pyaudio
+# macOS: brew install portaudio
 ```
 
-# How to Use
-1. Start the chatbot by running `streamlit run main.py`
-2. Select the AI provider you want to use
-3. Select the model you want to use
-4. Set the temperature and max tokens
-5. Select a system prompt depending on your purpose (e.g., ask a question, get code examples, read documents etc.)
-6. Load a document or URL if needed (optional)
-7. Start chatting with the chatbot
-8. Swap between different AI models during the conversation
-9. Save the chat log if needed wih the save state button (with a file name)
-10. You can also load previous chat logs by typing the file name in the load state box
-11. To clear the chat log, click the reset app button in the top left corner
-12. Monitor the costs incurred (approximate amount in $) by the chatbot in the lower left corner
+**For NLP Features:**
+```bash
+pip install spacy textblob
+python -m spacy download en_core_web_sm
+```
 
-# How to Contribute
+**For Database Features:**
+```bash
+# PostgreSQL
+pip install psycopg2-binary
+
+# MongoDB
+pip install pymongo
+
+# Firebase
+pip install firebase-admin
+```
+
+## 📁 Project Structure
+
+```
+code_chat_bot/
+├── main.py                    # Standard Streamlit app
+├── main_enhanced.py           # Enhanced app with all features
+├── requirements.txt           # Python dependencies
+├── pyproject.toml            # Modern package configuration
+├── FEATURES.md               # Detailed features documentation
+├── .env                      # API keys (create this)
+├── Logo.png                  # App logo
+├── Preview.png               # Screenshot
+├── src/code_chat_bot/        # Modular architecture
+│   ├── __init__.py          # Main exports
+│   ├── config/              # Configuration management
+│   ├── models/              # Pydantic data models
+│   ├── providers/           # AI provider implementations
+│   ├── document_processing/ # RAG and document handling
+│   ├── database/            # Database integrations
+│   ├── voice/               # Voice input/output
+│   ├── nlp_analysis/        # NLP features
+│   ├── i18n/                # Multi-language support
+│   ├── monitoring/          # Logging and metrics
+│   └── agents/              # AI agents
+├── previous_chats/          # Saved chat logs
+└── upload_docs/             # Document staging area
+```
+
+## 🚀 How to Use
+
+### Basic Usage
+1. Start the chatbot: `streamlit run main.py`
+2. Select an AI provider (OpenAI, Anthropic, etc.)
+3. Choose a model from the dropdown
+4. Adjust temperature and max tokens if needed
+5. Select a system prompt for your use case
+6. Start chatting!
+
+### Advanced Features
+
+**Document Processing:**
+1. Upload a file (PDF, TXT, CSV) OR enter a URL
+2. Configure RAG settings (chunk size, search type)
+3. Ask questions about your document
+4. The AI will use relevant context to answer
+
+**Voice Interaction:**
+1. Enable "Voice Input/Output" in sidebar
+2. Click 🎤 to speak your question
+3. Click 🔊 to hear the AI's response
+
+**Analytics:**
+1. Switch to "📊 Analytics" tab
+2. View sentiment analysis of conversation
+3. See extracted entities and keywords
+4. Monitor costs and token usage
+
+**AI Agents:**
+1. Enable "AI Agents" in sidebar
+2. Navigate to "🤖 Agents" tab
+3. Choose an agent (Summarizer, Research, Q&A)
+4. Configure parameters and run
+
+**Multi-language:**
+1. Select your language from dropdown
+2. UI updates automatically
+3. AI can respond in your chosen language
+
+**Database Persistence:**
+1. Enter a session ID
+2. Click "💾 Save" to persist chat
+3. Click "📂 Load" to restore later
+4. View recent sessions in dropdown
+
+## ⚙️ Configuration
+
+### Environment Variables
+
+**Required:**
+- `OPENAI`: Your OpenAI API key
+- `ANTHROPIC`: Your Anthropic API key
+- `MISTRAL`: Your MistralAI API key
+- `COHERE`: Your Cohere API key
+- `GOOGLE_API_KEY`: Your Google AI API key
+
+**Optional:**
+- `DB_TYPE`: Database type (json, mongodb, postgresql, firebase)
+- `MONGODB_URI`: MongoDB connection string
+- `POSTGRES_HOST`, `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`
+- `LOG_LEVEL`: Logging level (DEBUG, INFO, WARNING, ERROR)
+
+### Database Setup
+
+**PostgreSQL:**
+```bash
+export DB_TYPE=postgresql
+export POSTGRES_HOST=localhost
+export POSTGRES_DB=chatbot
+export POSTGRES_USER=postgres
+export POSTGRES_PASSWORD=your_password
+```
+
+**MongoDB:**
+```bash
+export DB_TYPE=mongodb
+export MONGODB_URI=mongodb://localhost:27017/
+```
+
+## 📚 Documentation
+
+- **[FEATURES.md](FEATURES.md)**: Comprehensive feature documentation
+- **[MODERNIZATION.md](MODERNIZATION.md)**: Architecture details
+
+## 🤝 How to Contribute
+
 1. Fork the repository
-2. Create a new branch
-3. Make your changes
-4. Push your changes to your branch
-5. Create a pull request
-6. Wait for the pull request to be reviewed
-7. Merge the pull request
-8. Celebrate your contribution
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-# License
+## 📝 License
+
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-# Acknowledgements
-- [OpenAI](https://openai.com)
-- [MistralAI](https://mistral.ai)
-- [Anthropic](https://anthropic.com)
-- [Cohere](https://cohere.ai)
+## 🙏 Acknowledgements
 
-# Contact
-If you have any questions or suggestions, feel free to contact me.
+- [OpenAI](https://openai.com) - GPT models
+- [Anthropic](https://anthropic.com) - Claude models
+- [MistralAI](https://mistral.ai) - Mistral models
+- [Cohere](https://cohere.ai) - Command models
+- [Google AI](https://ai.google.dev/) - Gemini models
+- [Streamlit](https://streamlit.io) - Web framework
+- [LangChain](https://langchain.com) - RAG framework
+
+## 📧 Contact
+
+For questions or suggestions, please open an issue on GitHub.
+
+## ⭐ Star History
+
+If you find this project useful, please consider giving it a star!
+
+---
+
+**Made with ❤️ by CodeHalwell**
 
 
 
